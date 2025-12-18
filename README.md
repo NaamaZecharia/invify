@@ -1,97 +1,48 @@
-# 🧠 Smart Task Manager
+# Invify
 
-Smart Task Manager is a full-stack task management application built with a modern microservices-ready architecture. It allows users to register, log in, and manage personal tasks with statuses, deadlines, and secure access. The project is designed for growth, CI/CD integration, and future cloud deployment.
-
----
-
-## 🚀 Tech Stack
-
-### 🔹 Frontend
-- React
-- TypeScript
-- Tailwind CSS
-- Vite
-
-### 🔹 Backend
-- Node.js
-- Express.js
-- PostgreSQL
-- JWT (Authentication)
-- Docker
-
-### 🔹 DevOps & Deployment
-- Docker Compose
-- GitHub Actions (planned)
-- Cloud-ready (AWS / Render in future phase)
+**Invify** is a lightweight, full-featured inventory management system designed for small businesses to manage products, categories, and stock levels with ease. Built as a freelance project to demonstrate strong full-stack capabilities using modern web technologies.
 
 ---
 
-## ✨ Features
+## 🚀 Features
 
-- User registration and login with secure JWT tokens
-- Task CRUD: create, read, update, delete
-- Task filtering by status (`todo`, `in_progress`, `done`)
-- Responsive UI with Tailwind CSS
-- PostgreSQL database integration
-- Modular file structure for scalable development
-- Dockerized development environment
-
----
-
-## 📁 Folder Structure
-smart-task-manager/
-├── backend/ → Node.js + Express API
-├── frontend/ → React + TypeScript UI
-├── docker-compose.yml
-└── README.md
-
+- 🔐 **Authentication** with JWT & bcrypt
+- 🧾 **Category & Product Management**
+- 📦 Track inventory quantities, pricing & descriptions
+- 🧠 **Protected API routes** with middleware enforcement
+- 📊 Ready for future **reporting, order tracking, and analytics**
+- 🛡️ Built with security and scalability in mind
 
 ---
 
-## 🧪 Getting Started (Local Dev)
+## 🛠️ Tech Stack
 
-### Clone the repo
+**Frontend**
+- Vite + React + TypeScript
+- React Router
+- Axios
+- Vitest + React Testing Library
 
-git clone https://github.com/NaamaZecharia/smart-task-manager.git
-cd smart-task-manager
+**Backend**
+- Express.js + TypeScript
+- PostgreSQL with Prisma ORM
+- JWT Authentication
+- Express Middleware
+- Docker-ready architecture
 
-## Run with Docker
-docker-compose up --build
+---
 
---
+## 🧪 Testing
 
-## 🔐 API Endpoints (Backend)
-## Auth
-POST /api/auth/signup
-POST /api/auth/login
+- Component & integration testing using `Vitest` and `@testing-library/react`
+- Test coverage for core forms & business logic
 
-## Tasks (Protected routes – require JWT)
-GET    /api/tasks
-POST   /api/tasks
-PUT    /api/tasks/:id
-DELETE /api/tasks/:id
+---
 
---
+## ⚙️ Setup Instructions
 
-## 📌 Roadmap
- JWT-based authentication
-
- - [ ] PostgreSQL DB integration
-
- - [ ] REST API for tasks
-
- - [ ] React + Tailwind UI
-
- - [ ] GraphQL API layer (optional)
-
-- [ ]  CI/CD via GitHub Actions
-
-- [ ]  Cloud deployment (Render / AWS)
-
- - [ ] Notification microservice (Kafka or Redis pub/sub)
-
---
-
-## 👩‍💻 Created by
-Naama Bayles
-Full Stack Developer | naamaz56@gmail.com | [LinkedIn](https://www.linkedin.com/in/naama-bayles-565826134/)
+1. Clone the repository
+2. Set up your `.env` files for frontend and backend
+3. Run Prisma migrations:  
+   ```bash
+   npx prisma migrate dev
