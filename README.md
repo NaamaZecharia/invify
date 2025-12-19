@@ -83,7 +83,7 @@ Small businesses often track inventory across spreadsheets, notes, and scattered
 
 ### Clone & install
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/NaamaZecharia/invify.git
 cd invify
 ```
 
