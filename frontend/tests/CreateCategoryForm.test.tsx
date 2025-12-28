@@ -6,32 +6,49 @@ vi.mock('../src/api/category', () => ({
   createCategory: vi.fn(),
 }));
 
-import { createCategory } from '../src/api/category';
+import { createCategory, getCategoryTypes, type CategoryDto } from "../src/api/category";
 
 describe('CreateCategoryForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders the form fields', () => {
+  it('renders the form fields', async () => {
+     vi.mocked(getCategoryTypes).mockResolvedValue([
+      { id: "t1", code: "SERVICE", label: "Service" },
+    ]);
+
     render(<CreateCategoryForm onCreated={() => {}} />);
 
-    expect(screen.getByPlaceholderText(/code/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/name/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/type/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/code/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    expect(await screen.findByRole("combobox")).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add category/i })).toBeInTheDocument();
   });
 
   it('calls createCategory with form data and then calls onCreated', async () => {
     const onCreated = vi.fn();
 
-    vi.mocked(createCategory).mockResolvedValue(undefined);
+    vi.mocked(getCategoryTypes).mockResolvedValue([
+      { id: "t1", code: "SERVICE", label: "Service" },
+      { id: "t2", code: "PRODUCT", label: "Product" },
+    ]);
+
+    vi.mocked(createCategory).mockResolvedValue({
+      id: "c1",
+      code: "TEST",
+      name: "Test Category",
+      typeId: "t2",
+      type: { id: "t2", code: "PRODUCT", label: "Product" },
+    } as CategoryDto);
 
     render(<CreateCategoryForm onCreated={onCreated} />);
 
-    fireEvent.change(screen.getByPlaceholderText(/code/i), { target: { value: 'TEST' } });
-    fireEvent.change(screen.getByPlaceholderText(/name/i), { target: { value: 'Test Category' } });
-    fireEvent.change(screen.getByPlaceholderText(/type/i), { target: { value: 'Optional' } });
+    fireEvent.change(screen.getByLabelText(/code/i), { target: { value: 'test' } });
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Test Category' } });
+    
+    const typeSelect = await screen.findByRole("combobox");
+    fireEvent.change(typeSelect, { target: { value: "t2" } });
 
     fireEvent.click(screen.getByRole('button', { name: /add category/i }));
 
@@ -43,34 +60,36 @@ describe('CreateCategoryForm', () => {
     expect(createCategory).toHaveBeenCalledWith({
       code: 'TEST',
       name: 'Test Category',
-      type: 'Optional',
+       typeId: "t2",
     });
 
-    expect(screen.getByPlaceholderText(/code/i)).toHaveValue('');
-    expect(screen.getByPlaceholderText(/name/i)).toHaveValue('');
-    expect(screen.getByPlaceholderText(/type/i)).toHaveValue('');
+    expect(screen.getByLabelText(/code/i)).toHaveValue('');
+    expect(screen.getByLabelText(/name/i)).toHaveValue('');
+    expect(screen.getByRole("combobox")).toHaveValue('');
   });
 
   it('shows alert on failure and does not call onCreated', async () => {
     const onCreated = vi.fn();
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+     vi.mocked(getCategoryTypes).mockResolvedValue([
+      { id: "t1", code: "SERVICE", label: "Service" },
+    ]);
 
     vi.mocked(createCategory).mockRejectedValue(new Error('boom'));
 
     render(<CreateCategoryForm onCreated={onCreated} />);
 
-    fireEvent.change(screen.getByPlaceholderText(/code/i), { target: { value: 'TEST' } });
-    fireEvent.change(screen.getByPlaceholderText(/name/i), { target: { value: 'Test Category' } });
+    fireEvent.change(screen.getByLabelText(/code/i), { target: { value: 'TEST' } });
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Test Category' } });
+
+    await screen.findByRole("combobox");
 
     fireEvent.click(screen.getByRole('button', { name: /add category/i }));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Failed to create category');
+      expect(screen.getByText(/failed to create category/i)).toBeInTheDocument();
     });
 
     expect(onCreated).not.toHaveBeenCalled();
-
-    alertSpy.mockRestore();
   });
 });

@@ -13,11 +13,22 @@ model User {
   password String
 }
 
+model CategoryType {
+  id    String @id @default(uuid())
+  code  String @unique
+  label String
+
+  categories Category[]
+}
+
 model Category {
   id    String   @id @default(uuid())
   code  String   @unique
   name  String
-  type  String?
+ 
+  typeId String?
+  type   CategoryType? @relation(fields: [typeId], references: [id])
+  
   products Product[]
 }
 
