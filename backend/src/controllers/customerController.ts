@@ -1,19 +1,21 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../prisma";
 
 export const getCustomers = async (req: Request, res: Response) => {
-  const customers = await prisma.customer.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(customers);
+  try {
+    const customers = await prisma.customer.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(customers);
+  } catch {
+    res.status(500).json({ message: "Failed to load customers" });
+  }
 };
 
 export const createCustomer = async (req: Request, res: Response) => {
-  const { firstName, LastName, phone, email, address, companyName } = req.body as {
+  const { firstName, lastName, phone, email, address, companyName } = req.body as {
     firstName: string;
-    LastName: string;
+    lastName: string;
     phone?: string;
     email?: string;
     address?: string;
@@ -21,7 +23,7 @@ export const createCustomer = async (req: Request, res: Response) => {
   };
 
   const normalizedFirstName = (firstName ?? "").trim();
-  const normalizedLastName = (LastName ?? "").trim();
+  const normalizedLastName = (lastName ?? "").trim();
   const normalizedPhone = (phone ?? "").trim() || null;
   const normalizedEmail = (email ?? "").trim() || null;
   // check if email is valid
@@ -32,7 +34,7 @@ export const createCustomer = async (req: Request, res: Response) => {
   const normalizedCompanyName = (companyName ?? "").trim() || null;
 
   if (!normalizedFirstName || !normalizedLastName) {
-    return res.status(400).json({ message: "firstName and LastName are required" });
+    return res.status(400).json({ message: "firstName and lastName are required" });
   }
 
   const created = await prisma.customer.create({
@@ -51,36 +53,39 @@ export const createCustomer = async (req: Request, res: Response) => {
 
 export const updateCustomer = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { firstName, LastName, phone, email, address, companyName } = req.body as {
+  const { firstName, lastName, phone, email, address, companyName } = req.body as {
     firstName?: string;
-    LastName?: string;
+    lastName?: string;
     phone?: string;
     email?: string;
     address?: string;
     companyName?: string;
   };
 
-  const normalizedFirstName = firstName ? firstName.trim() : undefined;
-  const normalizedLastName = LastName ? LastName.trim() : undefined;
+  const normalizedFirstName = firstName !== undefined ? firstName.trim() : undefined;
+  const normalizedLastName = lastName !== undefined ? lastName.trim() : undefined;
   const normalizedPhone = phone !== undefined ? (phone.trim() || null) : undefined;
   const normalizedEmail = email !== undefined ? (email.trim() || null) : undefined;
   const normalizedAddress = address !== undefined ? (address.trim() || null) : undefined;
   const normalizedCompanyName = companyName !== undefined ? (companyName.trim() || null) : undefined;
 
-  const updateData: any = {};
-  if (normalizedFirstName !== undefined) updateData.firstName = normalizedFirstName;
-  if (normalizedLastName !== undefined) updateData.LastName = normalizedLastName;
-  if (normalizedPhone !== undefined) updateData.phone = normalizedPhone;
-  if (normalizedEmail !== undefined) updateData.email = normalizedEmail;
-  if (normalizedAddress !== undefined) updateData.address = normalizedAddress;
-  if (normalizedCompanyName !== undefined) updateData.companyName = normalizedCompanyName;
-
   if (normalizedFirstName !== undefined && !normalizedFirstName) {
     return res.status(400).json({ message: "firstName cannot be empty" });
   }
   if (normalizedLastName !== undefined && !normalizedLastName) {
-    return res.status(400).json({ message: "LastName cannot be empty" });
+    return res.status(400).json({ message: "lastName cannot be empty" });
   }
+  if (normalizedEmail !== undefined && normalizedEmail && !isValidEmail(normalizedEmail)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+
+  const updateData: any = {};
+  if (normalizedFirstName !== undefined) updateData.firstName = normalizedFirstName;
+  if (normalizedLastName !== undefined) updateData.lastName = normalizedLastName;
+  if (normalizedPhone !== undefined) updateData.phone = normalizedPhone;
+  if (normalizedEmail !== undefined) updateData.email = normalizedEmail;
+  if (normalizedAddress !== undefined) updateData.address = normalizedAddress;
+  if (normalizedCompanyName !== undefined) updateData.companyName = normalizedCompanyName;
 
   try {
     const updated = await prisma.customer.update({
@@ -89,9 +94,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
     });
     res.json(updated);
   } catch (e: any) {
-    if (e?.code === "P2025") {
-      return res.status(404).json({ message: "Customer not found" });
-    }
+    if (e?.code === "P2025") return res.status(404).json({ message: "Customer not found" });
     res.status(500).json({ message: "Failed to update customer" });
   }
 };

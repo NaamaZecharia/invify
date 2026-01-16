@@ -139,7 +139,7 @@ export default function Customers() {
             <label className="block text-sm font-medium">Last Name *</label>
             <input
               value={form.lastName}
-              onChange={(e) => setForm((p) => ({ ...p, LastName: e.target.value }))}
+              onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
               className="w-full rounded border px-3 py-2"
               placeholder="e.g. Doe"
               required

@@ -228,7 +228,7 @@ export default function Products() {
                     {p.name} <span className="text-gray-500">({p.code})</span>
                   </div>
                   <div className="text-sm text-gray-600">
-                    {p.category?.name} • Qty: {p.quantity} • ${p.price.toFixed(2)}
+                    {p.category?.name} • Qty: {p.quantity} • ${Number(p.price.toString()).toFixed(2)}
                   </div>
                   {p.description && <div className="text-sm text-gray-600 mt-1">{p.description}</div>}
                 </div>

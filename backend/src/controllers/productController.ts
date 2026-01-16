@@ -1,15 +1,18 @@
-    import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Request, Response } from "express";
+import { prisma } from "../prisma";
 
 export const getProducts = async (req: Request, res: Response) => {
-  const products = await prisma.product.findMany({
-    include: { category: { include: { type: true } } },
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(products);
+  try {
+    const products = await prisma.product.findMany({
+      include: { category: { include: { type: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(products);
+  } catch {
+    res.status(500).json({ message: "Failed to load products" });
+  }
 };
+
 
 export const createProduct = async (req: Request, res: Response) => {
   const { code, name, description, price, quantity, categoryId } = req.body as {

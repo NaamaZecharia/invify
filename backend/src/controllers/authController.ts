@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "../prisma";
 import { generateToken } from '../utils/generateToken';
 import { hashPassword, matchPassword } from '../utils/hash';
 
-const prisma = new PrismaClient();
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, password } = req.body;

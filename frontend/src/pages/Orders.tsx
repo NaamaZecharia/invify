@@ -82,7 +82,7 @@ export default function Orders() {
       }
 
       // Filter by total range
-      const total = parseFloat(order.total);
+      const total = Number(order.total ?? 0);
       if (filters.totalMin) {
         const min = parseFloat(filters.totalMin);
         if (isNaN(min) || total < min) return false;
@@ -314,16 +314,16 @@ export default function Orders() {
                     </div>
                   )}
                 </div>
-                <OrderEditorModal
-                  isOpen={openCreate}
-                  onClose={() => setOpenCreate(false)}
-                  onCreated={load}
-              />
               </div>
             </div>
           ))}
         </div>
       )}
+      <OrderEditorModal
+        isOpen={openCreate}
+        onClose={() => setOpenCreate(false)}
+        onCreated={load}
+      />
     </div>
   );
 }
