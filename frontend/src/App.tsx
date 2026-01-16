@@ -5,6 +5,9 @@ import About from './pages/About';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import CategoriesPage from './pages/Categories';
+import ProductsPage from './pages/Products';
+import CustomersPage from './pages/Customers';
+import OrdersPage from './pages/Orders';
 import PrivateRoute from './routes/PrivateRoute';
 
 function App() {
@@ -18,6 +21,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/categories" element={<PrivateRoute><CategoriesPage /></PrivateRoute>} />
+        <Route path="/products" element={<PrivateRoute><ProductsPage /></PrivateRoute>} />
+        <Route path="/customers" element={<PrivateRoute><CustomersPage /></PrivateRoute>} />
+        <Route path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />
       </Routes>
     </div>
     </>

@@ -13,7 +13,7 @@ describe('CreateCategoryForm', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the form fields', async () => {
+  test('renders the form fields', async () => {
      vi.mocked(getCategoryTypes).mockResolvedValue([
       { id: "t1", code: "SERVICE", label: "Service" },
     ]);
