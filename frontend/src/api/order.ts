@@ -11,6 +11,10 @@ export type OrderItemDto = {
   quantity: number;
   unitPrice: string;
   lineTotal: string;
+  productId?: string;
+  categoryName?: string;
+  categoryCode?: string;
+  typeLabel?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -31,18 +35,17 @@ export type OrderDto = {
   updatedAt: string;
 };
 
+export type CreateOrderItemInput =
+  | { productId: string; quantity: number }
+  | { name: string; unitPrice: string; quantity: number; description?: string };
+
 export type CreateOrderInput = {
   customerId: string;
   currency?: string;
   notes?: string;
   taxTotal?: string;
   discountTotal?: string;
-  items: Array<{
-    name: string;
-    description?: string;
-    quantity: number;
-    unitPrice: string;
-  }>;
+  items: CreateOrderItemInput[];
 };
 
 export type UpdateOrderInput = {
@@ -72,4 +75,9 @@ export const updateOrder = async (id: string, data: UpdateOrderInput): Promise<O
 
 export const deleteOrder = async (id: string): Promise<void> => {
   await api.delete(`/orders/${id}`);
+};
+
+export async function confirmOrder(id: string) {
+  const res = await api.post(`/orders/${id}/confirm`);
+  return res.data;
 };

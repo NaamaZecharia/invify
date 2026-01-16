@@ -256,4 +256,41 @@ export class OrderService {
       return updated;
       });
   }
+
+  static async confirmOrder(orderId: string) {
+    return prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: { items: true, customer: true },
+      });
+  
+      if (!order) throw new Error("Order not found");
+      if (order.status !== OrderStatus.DRAFT) {
+        throw new Error("Only DRAFT orders can be confirmed");
+      }
+      if (order.items.length === 0) throw new Error("Order has no items");
+  
+      // safety: recalc subtotal
+      const subtotal = order.items.reduce(
+        (acc, i) => acc.add(i.lineTotal),
+        new Prisma.Decimal(0)
+      );
+  
+      const total = subtotal.add(order.taxTotal).sub(order.discountTotal);
+  
+      if (total.isNegative()) throw new Error("Order total cannot be negative");
+  
+      const updated = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.CONFIRMED,
+          subtotal,
+          total,
+        },
+        include: { items: true, customer: true },
+      });
+      return updated;
+    });
+  }
+  
 }
