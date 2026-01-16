@@ -37,7 +37,7 @@ model Product {
   code        String   @unique
   name        String
   description String?
-  price       Decimal @db.Numeric(10,2)
+  price       Decimal  @db.Decimal(10, 2)
   quantity    Int
   createdAt   DateTime @default(now())
 
