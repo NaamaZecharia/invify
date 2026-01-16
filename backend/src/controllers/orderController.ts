@@ -141,3 +141,26 @@ export const deleteOrder = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to delete order" });
   }
 };
+
+export const confirmOrder = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const confirmed = await OrderService.confirmOrder(id);
+    res.json(confirmed);
+  } catch (e: any) {
+    const msg = e?.message || "Failed to confirm order";
+
+    if (msg === "Order not found") return res.status(404).json({ message: msg });
+    if (
+      msg === "Only DRAFT orders can be confirmed" ||
+      msg === "Order has no items" ||
+      msg === "Order total cannot be negative"
+    ) {
+      return res.status(400).json({ message: msg });
+    }
+
+    res.status(500).json({ message: "Failed to confirm order" });
+  }
+};
+

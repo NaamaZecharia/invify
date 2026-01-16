@@ -3,6 +3,7 @@ import axios from "axios";
 import { getOrders, type OrderDto } from "../api/order";
 import { getCustomers, type CustomerDto } from "../api/customer";
 import OrderEditorModal  from "../components/OrderEditorModal";
+import { confirmOrder } from "../api/order";
 
 type FilterState = {
   customerId: string;
@@ -314,6 +315,20 @@ export default function Orders() {
                     </div>
                   )}
                 </div>
+                {order.status === "DRAFT" && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const ok = window.confirm("Confirm this order? You won’t be able to edit items after.");
+                        if (!ok) return;
+                        await confirmOrder(order.id);
+                        await load();
+                      }}
+                      className="rounded bg-blue-600 px-3 py-1 text-white text-sm hover:bg-blue-700"
+                    >
+                      Confirm
+                    </button>
+                  )}
               </div>
             </div>
           ))}
