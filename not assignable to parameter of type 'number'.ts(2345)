@@ -1,0 +1,41 @@
+[33mcommit eb54b7c6b66daa63046f8dbff868717a173e17f4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/order-product-integration[m[33m)[m
+Author: NaamaZecharia <naamaz56@cs.colman.ac.il>
+Date:   Fri Jan 16 12:05:12 2026 -0600
+
+    Add order creation with product and custom items
+
+ .github/copilot-instructions.md                    | 113 [32m+++++[m
+ backend/node_modules/.package-lock.json            |   9 [32m+[m
+ backend/package-lock.json                          |  12 [32m+[m[31m-[m
+ backend/package.json                               |   5 [32m+[m[31m-[m
+ .../migration.sql                                  |  14 [32m+[m
+ .../20260115235255_add_orders/migration.sql        |  63 [32m+++[m
+ .../migration.sql                                  |  20 [32m+[m
+ backend/prisma/schema.prisma                       | 103 [32m+++[m[31m-[m
+ backend/src/app.ts                                 |   6 [32m+[m
+ backend/src/controllers/customerController.ts      | 115 [32m+++++[m
+ backend/src/controllers/orderController.ts         | 144 [32m++++++[m
+ backend/src/controllers/productController.ts       | 129 [32m+++++[m
+ backend/src/routes/customerRoutes.ts               |  12 [32m+[m
+ backend/src/routes/orderRoutes.ts                  |  13 [32m+[m
+ backend/src/routes/productRoutes.ts                |  12 [32m+[m
+ backend/src/services/orderService.ts               | 259 [32m++++++++++[m
+ backend/src/services/productService.ts             |   0
+ backend/src/validators/orderSchemas.ts             |  26 [32m+[m
+ frontend/src/App.tsx                               |   6 [32m+[m
+ frontend/src/api/customer.ts                       |  50 [32m++[m
+ frontend/src/api/order.ts                          |  75 [32m+++[m
+ frontend/src/api/product.ts                        |  42 [32m++[m
+ frontend/src/components/EditCustomerModal.tsx      | 192 [32m+++++++[m
+ frontend/src/components/EditProductModal.tsx       | 222 [32m+++++++++[m
+ frontend/src/components/Navbar.tsx                 |  17 [32m+[m[31m-[m
+ frontend/src/components/OrderEditorModal.tsx       | 553 [32m+++++++++++++++++++++[m
+ frontend/src/pages/Customers.tsx                   | 252 [32m++++++++++[m
+ frontend/src/pages/Orders.tsx                      | 329 [32m++++++++++++[m
+ frontend/src/pages/Products.tsx                    | 263 [32m++++++++++[m
+ frontend/tests/CreateCategoryForm.test.tsx         |   2 [32m+[m[31m-[m
+ frontend/tests/EditProductModal.test.tsx           |  75 [32m+++[m
+ frontend/tests/Products.test.tsx                   | 168 [32m+++++++[m
+ frontend/tests/factories/categoryFactory.ts        |  12 [32m+[m
+ frontend/tests/factories/productFactory.ts         |  22 [32m+[m
+ 34 files changed, 3317 insertions(+), 18 deletions(-)

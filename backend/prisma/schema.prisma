@@ -8,8 +8,8 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  username String   @unique
+  id       String @id @default(uuid())
+  username String @unique
   password String
 }
 
@@ -22,25 +22,102 @@ model CategoryType {
 }
 
 model Category {
-  id    String   @id @default(uuid())
-  code  String   @unique
-  name  String
- 
+  id   String @id @default(uuid())
+  code String @unique
+  name String
+
   typeId String?
   type   CategoryType? @relation(fields: [typeId], references: [id])
-  
+
   products Product[]
 }
 
 model Product {
-  id         String   @id @default(uuid())
-  code       String   @unique
-  name       String
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
   description String?
-  price      Float
-  quantity   Int
-  createdAt  DateTime @default(now())
+  price       Decimal @db.Numeric(10,2)
+  quantity    Int
+  createdAt   DateTime @default(now())
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
+
+  orderItems OrderItem[]
+}
+
+model Customer {
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  phone       String?
+  email       String?
+  address     String?
+  companyName String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders Order[]
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  CANCELED
+  FULFILLED
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  status   OrderStatus @default(DRAFT)
+  currency String      @default("USD")
+
+  // Stored totals (computed from items + tax/discount)
+  subtotal      Decimal @default(0)
+  taxTotal      Decimal @default(0)
+  discountTotal Decimal @default(0)
+  total         Decimal @default(0)
+
+  notes String?
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  quantity Int
+
+  // Snapshots (freeze data at purchase time)
+  name        String
+  description String?
+  unitPrice   Decimal
+  lineTotal   Decimal
+
+  categoryName String?
+  categoryCode String?
+  typeLabel    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
 }
