@@ -12,7 +12,7 @@ type Props = {
 
 type FormState = {
   firstName: string;
-  LastName: string;
+  lastName: string;
   phone: string;
   email: string;
   address: string;
@@ -22,7 +22,7 @@ type FormState = {
 export default function EditCustomerModal({ isOpen, onClose, customer, onUpdated }: Props) {
   const [form, setForm] = useState<FormState>({
     firstName: "",
-    LastName: "",
+    lastName: "",
     phone: "",
     email: "",
     address: "",
@@ -38,7 +38,7 @@ export default function EditCustomerModal({ isOpen, onClose, customer, onUpdated
     // init form from customer
     setForm({
       firstName: customer?.firstName ?? "",
-      LastName: customer?.LastName ?? "",
+      lastName: customer?.lastName ?? "",
       phone: customer?.phone ?? "",
       email: customer?.email ?? "",
       address: customer?.address ?? "",
@@ -49,13 +49,13 @@ export default function EditCustomerModal({ isOpen, onClose, customer, onUpdated
 
   const validation = useMemo(() => {
     const firstName = form.firstName.trim();
-    const lastName = form.LastName.trim();
+    const lastName = form.lastName.trim();
 
     if (!firstName) return { ok: false as const, message: "First name is required" };
     if (!lastName) return { ok: false as const, message: "Last name is required" };
 
     return { ok: true as const, message: "" };
-  }, [form.firstName, form.LastName]);
+  }, [form.firstName, form.lastName]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +71,7 @@ export default function EditCustomerModal({ isOpen, onClose, customer, onUpdated
       setSubmitting(true);
       await updateCustomer(customer.id, {
         firstName: form.firstName.trim(),
-        LastName: form.LastName.trim(),
+        lastName: form.lastName.trim(),
         phone: form.phone.trim() || undefined,
         email: form.email.trim() || undefined,
         address: form.address.trim() || undefined,
@@ -119,8 +119,8 @@ export default function EditCustomerModal({ isOpen, onClose, customer, onUpdated
           <div className="space-y-1">
             <label className="block text-sm font-medium">Last Name *</label>
             <input
-              value={form.LastName}
-              onChange={(e) => setForm((p) => ({ ...p, LastName: e.target.value }))}
+              value={form.lastName}
+              onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
               className="w-full rounded border px-3 py-2"
               placeholder="e.g. Doe"
               required
