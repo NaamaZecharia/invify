@@ -18,8 +18,23 @@ export default function Navbar() {
           </Link>
         </li>
         <li>
+          <Link to="/products" className="hover:text-yellow-300 transition">
+            Products
+          </Link>
+        </li>
+        <li>
           <Link to="/categories" className="hover:text-yellow-300 transition">
-            categories
+            Categories
+          </Link>
+        </li>
+        <li>
+          <Link to="/customers" className="hover:text-yellow-300 transition">
+            Customers
+          </Link>
+        </li>
+        <li>
+          <Link to="/orders" className="hover:text-yellow-300 transition">
+            Orders
           </Link>
         </li>
         <li>
