@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import AuthForm from '../components/AuthForm';
 import api from '../utils/api';
 import axios from 'axios';
+import AlertModal from '../components/AlertModal';
 
 export default function Register() {
   const navigate = useNavigate();
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const handleRegister = async (data: { username: string; password: string }) => {
     try {
@@ -16,9 +19,9 @@ export default function Register() {
     } catch (err) {
       console.error('Registration failed', err);
       if (axios.isAxiosError(err) && err.response) {
-        alert('Registration failed: ' + err.response.data.message);
+        setAlertMessage('Registration failed: ' + err.response.data.message);
      } else {
-        alert('Registration failed: Unknown error');
+        setAlertMessage('Registration failed: Unknown error');
      }
     }
   };
@@ -30,6 +33,12 @@ export default function Register() {
         buttonLabel="Sign Up"
         onSubmit={handleRegister}
       />
+      <AlertModal
+      isOpen={!!alertMessage}
+      title="Register failed"
+      message={alertMessage ?? ""}
+      onClose={() => setAlertMessage(null)}
+    />
     </div>
   );
 }
