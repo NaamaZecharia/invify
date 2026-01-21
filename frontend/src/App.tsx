@@ -9,10 +9,12 @@ import ProductsPage from './pages/Products';
 import CustomersPage from './pages/Customers';
 import OrdersPage from './pages/Orders';
 import PrivateRoute from './routes/PrivateRoute';
+import { ToastProvider } from "./toast/ToastProvider";
 
 function App() {
   return (
     <>
+    <ToastProvider>
     <Navbar /> 
     <div className="p-4">
       <Routes>
@@ -26,6 +28,7 @@ function App() {
         <Route path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />
       </Routes>
     </div>
+    </ToastProvider>
     </>
   );
 }

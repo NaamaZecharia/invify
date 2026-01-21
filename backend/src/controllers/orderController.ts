@@ -146,8 +146,8 @@ export const confirmOrder = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const confirmed = await OrderService.confirmOrder(id);
-    res.json(confirmed);
+    const result = await OrderService.confirmOrder(id);
+    res.json(result); // { order, invoiceId }
   } catch (e: any) {
     const msg = e?.message || "Failed to confirm order";
 

@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, OrderStatus } from "@prisma/client";
+import { PrismaClient, Prisma, OrderStatus, InvoiceStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -261,11 +261,14 @@ export class OrderService {
     return prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
-        include: { items: true, customer: true },
+        include: { items: true, customer: true, invoice: true, },
       });
   
       if (!order) throw new Error("Order not found");
       if (order.status !== OrderStatus.DRAFT) {
+        if (order.status === OrderStatus.CONFIRMED && order.invoice) {
+          return { order, invoiceId: order.invoice.id };
+        }
         throw new Error("Only DRAFT orders can be confirmed");
       }
       if (order.items.length === 0) throw new Error("Order has no items");
@@ -279,8 +282,8 @@ export class OrderService {
       const total = subtotal.add(order.taxTotal).sub(order.discountTotal);
   
       if (total.isNegative()) throw new Error("Order total cannot be negative");
-  
-      const updated = await tx.order.update({
+
+      const confirmedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
           status: OrderStatus.CONFIRMED,
@@ -289,7 +292,43 @@ export class OrderService {
         },
         include: { items: true, customer: true },
       });
-      return updated;
+
+       const existingInvoice = await tx.invoice.findUnique({
+        where: { orderId: confirmedOrder.id },
+        select: { id: true },
+      });
+
+      if (existingInvoice) {
+        return { order: confirmedOrder, invoiceId: existingInvoice.id };
+      }
+
+        const invoice = await tx.invoice.create({
+        data: {
+          orderId: confirmedOrder.id,
+          customerId: confirmedOrder.customerId,
+          currency: confirmedOrder.currency,
+          subtotal: confirmedOrder.subtotal,
+          taxTotal: confirmedOrder.taxTotal,
+          discountTotal: confirmedOrder.discountTotal,
+          total: confirmedOrder.total,
+
+          items: {
+            create: confirmedOrder.items.map((it) => ({
+              name: it.name,
+              description: it.description,
+              quantity: it.quantity,
+              unitPrice: it.unitPrice,
+              lineTotal: it.lineTotal,
+              categoryName: it.categoryName,
+              categoryCode: it.categoryCode,
+              typeLabel: it.typeLabel,
+            })),
+          },
+        },
+        select: { id: true },
+      });
+      
+      return { order: confirmedOrder, invoiceId: invoice.id };
     });
   }
   

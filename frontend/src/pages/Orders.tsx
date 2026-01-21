@@ -4,6 +4,8 @@ import { getOrders, type OrderDto } from "../api/order";
 import { getCustomers, type CustomerDto } from "../api/customer";
 import OrderEditorModal  from "../components/OrderEditorModal";
 import { confirmOrder } from "../api/order";
+import { useToast } from "../toast/ToastProvider";
+import ConfirmModal from "../components/ConfirmModal";
 
 type FilterState = {
   customerId: string;
@@ -20,6 +22,10 @@ export default function Orders() {
   const [openCreate, setOpenCreate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [orderToConfirmId, setOrderToConfirmId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const [filters, setFilters] = useState<FilterState>({
     customerId: "",
@@ -318,15 +324,14 @@ export default function Orders() {
                 {order.status === "DRAFT" && (
                     <button
                       type="button"
-                      onClick={async () => {
-                        const ok = window.confirm("Confirm this order? You won’t be able to edit items after.");
-                        if (!ok) return;
-                        await confirmOrder(order.id);
-                        await load();
+                      disabled={confirming}
+                      onClick={() => {
+                        setOrderToConfirmId(order.id);
+                        setConfirmOpen(true);
                       }}
                       className="rounded bg-blue-600 px-3 py-1 text-white text-sm hover:bg-blue-700"
                     >
-                      Confirm
+                      {confirming ? "Confirming..." : "Confirm"}
                     </button>
                   )}
               </div>
@@ -339,6 +344,33 @@ export default function Orders() {
         onClose={() => setOpenCreate(false)}
         onCreated={load}
       />
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title="Confirm order"
+        message={`Confirm Order #${orderToConfirmId?.slice(0, 8)}? You won’t be able to edit items after.`}
+        confirmText="Yes, confirm"
+        cancelText="Cancel"
+        loading={confirming}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setOrderToConfirmId(null);
+        }}
+        onConfirm={async () => {
+          if (!orderToConfirmId) return;
+        try {
+          setConfirming(true);
+          await confirmOrder(orderToConfirmId);
+          await load();
+          showToast("Order confirmed ✅", "success");
+          setConfirmOpen(false);
+          setOrderToConfirmId(null);
+        } catch {
+          showToast("Failed to confirm order ❌", "error");
+        } finally {
+          setConfirming(false);
+        }
+      }}
+    />
     </div>
   );
 }

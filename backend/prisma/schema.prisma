@@ -58,7 +58,8 @@ model Customer {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orders Order[]
+  orders   Order[]
+  invoices Invoice[]
 }
 
 enum OrderStatus {
@@ -74,10 +75,11 @@ model Order {
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id])
 
+  invoice Invoice?
+
   status   OrderStatus @default(DRAFT)
   currency String      @default("USD")
 
-  // Stored totals (computed from items + tax/discount)
   subtotal      Decimal @default(0)
   taxTotal      Decimal @default(0)
   discountTotal Decimal @default(0)
@@ -120,4 +122,68 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENDING
+  SENT
+  PAID
+  OVERDUE
+  FAILED
+}
+
+model Invoice {
+  id String @id @default(uuid())
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  status   InvoiceStatus @default(DRAFT)
+  currency String        @default("USD")
+
+  subtotal      Decimal @default(0)
+  taxTotal      Decimal @default(0)
+  discountTotal Decimal @default(0)
+  total         Decimal @default(0)
+
+  invoiceNumber String?   @unique
+  issuedAt      DateTime  @default(now())
+  dueDate       DateTime?
+
+  pdfUrl    String?
+  lastError String?
+
+  items InvoiceItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model InvoiceItem {
+  id String @id @default(uuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  quantity    Int
+  unitPrice   Decimal
+  lineTotal   Decimal
+
+  categoryName String?
+  categoryCode String?
+  typeLabel    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
 }

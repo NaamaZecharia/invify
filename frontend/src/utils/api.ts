@@ -1,7 +1,12 @@
 import axios from 'axios';
+import { API_BASE_URL } from './config';
+
+if (!API_BASE_URL) {
+  throw new Error("API_BASE_URL is not defined. Check VITE_API_BASE_URL");
+}
 
 const api = axios.create({
-  baseURL:  import.meta.env.VITE_API_URL ?? "http://localhost:4000/api",
+  baseURL: API_BASE_URL,
   withCredentials: false,
 });
 
